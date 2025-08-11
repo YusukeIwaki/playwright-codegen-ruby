@@ -1,9 +1,9 @@
 /**
- * テスト用のHTMLページテンプレート
+ * HTML page templates for testing
  */
 export const HTML_PAGES = {
   /**
-   * ログインフォームページ
+   * Login form page
    */
   loginForm: `
     <!DOCTYPE html>
@@ -121,7 +121,7 @@ export const HTML_PAGES = {
           const remember = document.getElementById('remember-me').checked;
           const result = document.getElementById('login-result');
           
-          // 簡単な検証デモ
+          // Simple validation demo
           if (username && password) {
             result.className = 'success';
             result.textContent = \`Login successful! Welcome, \${username}\`;
@@ -138,7 +138,7 @@ export const HTML_PAGES = {
   `,
 
   /**
-   * 基本的なフォームページ
+   * Basic form page
    */
   basicForm: `
     <!DOCTYPE html>
@@ -160,7 +160,7 @@ export const HTML_PAGES = {
   `,
 
   /**
-   * 複雑なフォームページ（今後の拡張用）
+   * Complex form page (for future expansion)
    */
   complexForm: `
     <!DOCTYPE html>

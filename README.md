@@ -5,10 +5,7 @@ A Ruby-specific code generator for Playwright, providing a CLI tool to record br
 ## Overview
 
 ```bash
-# Install from npm
-npx playwright-codegen-ruby [options] [url]
-
-# Or run directly from GitHub (latest version)
+# Run directly from GitHub (latest version)
 npx github:YusukeIwaki/playwright-codegen-ruby [options] [url]
 ```
 
@@ -115,30 +112,20 @@ npx github:YusukeIwaki/playwright-codegen-ruby https://example.com
 npx github:YusukeIwaki/playwright-codegen-ruby --channel chrome https://example.com
 ```
 
-### Install from npm
-
-```bash
-# Install globally
-npm install -g playwright-codegen-ruby
-
-# Or use npx (recommended)
-npx playwright-codegen-ruby https://example.com
-```
-
 ### Usage Examples
 
 ```bash
 # Record interactions on example.com
-npx playwright-codegen-ruby https://example.com
+npx github:YusukeIwaki/playwright-codegen-ruby https://example.com
 
 # Use system Chrome instead of Chromium
-npx playwright-codegen-ruby --channel chrome https://example.com
+npx github:YusukeIwaki/playwright-codegen-ruby --channel chrome https://example.com
 
 # Use custom debug port for multiple instances
-npx playwright-codegen-ruby --port 9224 https://example.com
+npx github:YusukeIwaki/playwright-codegen-ruby --port 9224 https://example.com
 
 # Use Microsoft Edge with custom port
-npx playwright-codegen-ruby --channel msedge --port 9225 https://example.com
+npx github:YusukeIwaki/playwright-codegen-ruby --channel msedge --port 9225 https://example.com
 
 # Run from GitHub for latest features
 npx github:YusukeIwaki/playwright-codegen-ruby --port 9226 https://login.example.com

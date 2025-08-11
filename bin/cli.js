@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 const cliPath = join(__dirname, '..', 'src', 'cli.tsx');
 const args = process.argv.slice(2);
 
-// tsx を使用してTypeScriptファイルを実行
+// Execute TypeScript file using tsx
 const child = spawn('npx', ['tsx', cliPath, ...args], {
   stdio: 'inherit',
   shell: true

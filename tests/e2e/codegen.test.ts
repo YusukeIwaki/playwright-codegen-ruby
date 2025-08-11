@@ -5,7 +5,7 @@ import { HTML_PAGES } from '../fixtures/htmlPages.js';
 describe('Playwright Codegen Ruby E2E Tests', () => {
   const helper = new CLITestHelper();
 
-  // テスト後のクリーンアップ
+  // Cleanup after tests
   afterEach(async () => {
     await helper.cleanup();
   });
@@ -54,19 +54,19 @@ end
     const context = await helper.startCLI();
 
     try {
-      // ログインフォームページを設定
+      // Set up login form page
       await context.page.setContent(HTML_PAGES.loginForm);
 
-      // ログインフォームに入力
+      // Fill in login form
       await context.page.fill('#username', 'admin@example.com');
       await context.page.fill('#password', 'secretpassword123');
       await context.page.check('#remember-me');
       await context.page.click('#login-btn');
 
-      // コード生成を確実にするため少し待機
+      // Wait briefly to ensure code generation
       await helper.wait(1000);
 
-      // 生成されたRubyコードを検証
+      // Verify generated Ruby code
       helper.expectOutputContains([
         '# Recorded actions:',
         'page.fill("aria-ref=e7", "admin@example.com")',
@@ -87,18 +87,18 @@ end
     const context = await helper.startCLI();
 
     try {
-      // 基本フォームページを設定
+      // Set up basic form page
       await context.page.setContent(HTML_PAGES.basicForm);
 
-      // 基本フォームに入力
+      // Fill in basic form
       await context.page.fill('#name', 'John Doe');
       await context.page.fill('#email', 'john.doe@test.com');
       await context.page.click('#submit-btn');
 
-      // コード生成を確実にするため少し待機
+      // Wait briefly to ensure code generation
       await helper.wait(1000);
 
-      // 生成されたRubyコードを検証
+      // Verify generated Ruby code
       helper.expectOutputContains([
         '# Recorded actions:',
         'page.fill("aria-ref=e4", "John Doe")',
@@ -118,16 +118,16 @@ end
     const context = await helper.startCLI();
 
     try {
-      // ログインフォームページを設定
+      // Set up login form page
       await context.page.setContent(HTML_PAGES.loginForm);
 
-      // 空の状態でログインボタンをクリック
+      // Click login button with empty form
       await context.page.click('#login-btn');
 
-      // コード生成を確実にするため少し待機
+      // Wait briefly to ensure code generation
       await helper.wait(1000);
 
-      // 最低限のRuby構造が生成されていることを検証
+      // Verify that basic Ruby structure is generated
       helper.expectOutputContains([
         '# Recorded actions:',
         'page.click("aria-ref=e14")'

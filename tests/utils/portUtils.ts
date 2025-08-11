@@ -1,7 +1,7 @@
 import { createServer } from 'net';
 
 /**
- * 指定した範囲で利用可能なポートを見つける
+ * Find available port within specified range
  */
 export async function findAvailablePort(start: number, end: number): Promise<number> {
   for (let port = start; port <= end; port++) {
@@ -13,7 +13,7 @@ export async function findAvailablePort(start: number, end: number): Promise<num
 }
 
 /**
- * 指定したポートが利用可能かチェック
+ * Check if specified port is available
  */
 async function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {

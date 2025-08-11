@@ -14,10 +14,10 @@ export class CLITestHelper {
   private context: CLITestContext | null = null;
 
   /**
-   * CLIプロセスを起動してブラウザに接続
+   * Start CLI process and connect to browser
    */
   async startCLI(url?: string): Promise<CLITestContext> {
-    // 利用可能なポートを見つける
+    // Find available port
     const debugPort = await findAvailablePort(9225, 9230);
     console.log(`Using debug port: ${debugPort}`);
 
@@ -33,7 +33,7 @@ export class CLITestHelper {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    // CLI出力をキャプチャ
+    // Capture CLI output
     cliProcess.stdout?.on('data', (data) => {
       cliOutput += data.toString();
     });
@@ -42,10 +42,10 @@ export class CLITestHelper {
       console.error('CLI stderr:', data.toString());
     });
 
-    // CLIが起動するまで待機
+    // Wait for CLI to start
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // CDP経由でブラウザに接続
+    // Connect to browser via CDP
     const browser = await chromium.connectOverCDP(`http://localhost:${debugPort}`);
     const contexts = browser.contexts();
 
@@ -74,7 +74,7 @@ export class CLITestHelper {
   }
 
   /**
-   * CLIプロセスとブラウザを適切に終了
+   * Properly terminate CLI process and browser
    */
   async cleanup(): Promise<string> {
     if (!this.context) return '';
@@ -82,7 +82,7 @@ export class CLITestHelper {
     const { cliProcess, browser } = this.context;
 
     try {
-      // ブラウザを閉じる
+      // Close browser
       if (browser) {
         await browser.close();
       }
@@ -90,11 +90,11 @@ export class CLITestHelper {
       console.error('Error closing browser:', error);
     }
 
-    // CLIプロセスを終了
+    // Terminate CLI process
     if (cliProcess && !cliProcess.killed) {
       cliProcess.kill('SIGTERM');
 
-      // プロセス終了を待機
+      // Wait for process termination
       await new Promise(resolve => {
         cliProcess.on('exit', resolve);
         setTimeout(() => {
@@ -110,21 +110,21 @@ export class CLITestHelper {
   }
 
   /**
-   * 現在のCLI出力を取得
+   * Get current CLI output
    */
   getCLIOutput(): string {
     return this.context?.cliOutput || '';
   }
 
   /**
-   * 指定した時間待機
+   * Wait for specified time
    */
   async wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
-   * 期待するRubyコードが出力に含まれているかチェック
+   * Check if expected Ruby code is included in output
    */
   expectOutputContains(expectedStrings: string[]): void {
     const output = this.getCLIOutput();
