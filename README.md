@@ -5,7 +5,11 @@ A Ruby-specific code generator for Playwright, providing a CLI tool to record br
 ## Overview
 
 ```bash
-npx playwright-codegen-ruby [--browser chromium] [--channel chrome] [url]
+# Install from npm
+npx playwright-codegen-ruby [options] [url]
+
+# Or run directly from GitHub (latest version)
+npx github:YusukeIwaki/playwright-codegen-ruby [options] [url]
 ```
 
 It launches a browser and records activities just like `npx playwright codegen`, but generates Ruby code using the [playwright-ruby-client](https://github.com/YusukeIwaki/playwright-ruby-client) library.
@@ -96,7 +100,32 @@ npm run test
 npm run test:watch
 ```
 
-## Usage Examples
+## Installation & Usage
+
+### Quick Start (No Installation Required)
+
+```bash
+# Run directly from GitHub (always latest version)
+npx github:YusukeIwaki/playwright-codegen-ruby
+
+# With specific URL
+npx github:YusukeIwaki/playwright-codegen-ruby https://example.com
+
+# Use system Chrome
+npx github:YusukeIwaki/playwright-codegen-ruby --channel chrome https://example.com
+```
+
+### Install from npm
+
+```bash
+# Install globally
+npm install -g playwright-codegen-ruby
+
+# Or use npx (recommended)
+npx playwright-codegen-ruby https://example.com
+```
+
+### Usage Examples
 
 ```bash
 # Record interactions on example.com
@@ -110,6 +139,9 @@ npx playwright-codegen-ruby --port 9224 https://example.com
 
 # Use Microsoft Edge with custom port
 npx playwright-codegen-ruby --channel msedge --port 9225 https://example.com
+
+# Run from GitHub for latest features
+npx github:YusukeIwaki/playwright-codegen-ruby --port 9226 https://login.example.com
 ```
 
 ### Generated Code Example
@@ -138,9 +170,11 @@ end
 
 ```
 playwright-codegen-ruby/
+├── bin/
+│   └── cli.js                 # Entry point wrapper for npx execution
 ├── src/
-│   ├── cli.tsx                # Main CLI entry point with Ruby script generation
-│   ├── useBrowserRecorder.ts  # Browser recording hook
+│   ├── cli.tsx                # Main CLI application with Ruby script generation
+│   ├── useBrowserRecorder.ts  # Browser recording hook and CDP integration
 │   └── rubyCodeGenerator.ts   # Ruby code generation from Playwright actions
 ├── tests/
 │   ├── e2e/
@@ -148,11 +182,12 @@ playwright-codegen-ruby/
 │   ├── fixtures/
 │   │   └── htmlPages.ts       # Test HTML page templates
 │   └── utils/
-│       ├── cliTestHelper.ts   # Common test utilities
+│       ├── cliTestHelper.ts   # Common test utilities and CLI process management
 │       └── portUtils.ts       # Port detection utilities
-├── package.json               # Dependencies and scripts
+├── package.json               # Dependencies, scripts, and npm configuration
 ├── tsconfig.json              # TypeScript configuration
 ├── vitest.config.ts           # Test configuration
+├── .npmignore                 # Files excluded from npm package
 ├── CLAUDE.md                  # Development guidelines for AI assistance
 └── README.md                  # This file
 ```

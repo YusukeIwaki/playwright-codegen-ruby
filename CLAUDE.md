@@ -129,6 +129,36 @@ Options:
 - **Script Template**: Generates complete scripts with `Playwright.create` boilerplate
 - **Terminal Output**: Real-time display of generated Ruby code with proper formatting
 
+### NPX Execution Support
+- **GitHub Direct Execution**: `npx github:YusukeIwaki/playwright-codegen-ruby` for latest version
+- **Wrapper Script**: `bin/cli.js` handles npx execution by spawning tsx
+- **Dependencies**: tsx moved to runtime dependencies for npx availability
+
+### Project Structure
+```
+playwright-codegen-ruby/
+├── bin/
+│   └── cli.js                 # Entry point wrapper for npx execution
+├── src/
+│   ├── cli.tsx                # Main CLI application with Ruby script generation
+│   ├── useBrowserRecorder.ts  # Browser recording hook and CDP integration
+│   └── rubyCodeGenerator.ts   # Ruby code generation from Playwright actions
+├── tests/
+│   ├── e2e/
+│   │   └── codegen.test.ts    # End-to-end tests for code generation
+│   ├── fixtures/
+│   │   └── htmlPages.ts       # Test HTML page templates
+│   └── utils/
+│       ├── cliTestHelper.ts   # Common test utilities and CLI process management
+│       └── portUtils.ts       # Port detection utilities
+├── package.json               # Dependencies, scripts, and npm configuration
+├── tsconfig.json              # TypeScript configuration
+├── vitest.config.ts           # Test configuration
+├── .npmignore                 # Files excluded from npm package
+├── CLAUDE.md                  # Development guidelines for AI assistance
+└── README.md                  # Documentation and usage examples
+```
+
 ### Testing
 
 - **E2E Tests**: Comprehensive end-to-end testing using Vitest
@@ -136,6 +166,23 @@ Options:
 - **Test Scenarios**: Multiple form interaction scenarios (login, basic forms, empty forms)
 - **Code Validation**: Exact string matching for generated Ruby code verification
 - **Port Management**: Automatic port detection (9225-9230) for concurrent test runs
+
+### Installation and Usage
+
+#### Quick Start (No Installation)
+```bash
+# Run directly from GitHub (always latest version)
+npx github:YusukeIwaki/playwright-codegen-ruby
+npx github:YusukeIwaki/playwright-codegen-ruby https://example.com
+npx github:YusukeIwaki/playwright-codegen-ruby --channel chrome https://example.com
+```
+
+#### Install from npm
+```bash
+# Install globally or use npx
+npm install -g playwright-codegen-ruby
+npx playwright-codegen-ruby https://example.com
+```
 
 ### Next Implementation Steps
 1. Improve selector generation (replace aria-ref with better strategies)
