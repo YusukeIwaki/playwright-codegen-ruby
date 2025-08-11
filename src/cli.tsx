@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 
-import { chromium, firefox, webkit, Browser, Page } from 'playwright-core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { render, Text, Box } from 'ink';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { useBrowserRecorder, RecordedAction } from './useBrowserRecorder.js';
 
 interface AppProps {
   browserType: 'chromium' | 'firefox' | 'webkit';
@@ -34,69 +34,23 @@ const argv = await yargs(hideBin(process.argv))
   .argv;
 
 const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
-  const [browser, setBrowser] = useState<Browser | null>(null);
-  const [status, setStatus] = useState('Starting...');
+  const { status, actions, stop } = useBrowserRecorder({ browserType, channel, url });
 
+  // When process receives signals, ask hook to stop (once) then exit after short delay
   useEffect(() => {
-    let browserInstance: Browser | null = null;
-    let page: Page | null = null;
-
-    const launch = async () => {
-      try {
-        setStatus(`Launching ${browserType}${channel ? ` (${channel})` : ''}...`);
-
-        const browsers = {
-          chromium,
-          firefox,
-          webkit
-        };
-
-        const selectedBrowser = browsers[browserType];
-
-        const launchOptions: any = { headless: false };
-
-        if (channel) {
-          launchOptions.channel = channel;
-        }
-
-        browserInstance = await selectedBrowser.launch(launchOptions);
-
-        setBrowser(browserInstance);
-
-        const context = await browserInstance.newContext({
-          viewport: null
-        });
-
-        page = await context.newPage();
-        
-        if (url) {
-          await page.goto(url);
-        }
-
-        setStatus(`${browserType}${channel ? ` (${channel})` : ''} is running. Press Ctrl+C to exit.`);
-      } catch (error) {
-        setStatus(`Error: ${(error as Error).message}`);
-        process.exit(1);
-      }
+    const handler = () => {
+      void (async () => {
+        await stop();
+        setTimeout(() => process.exit(0), 50);
+      })();
     };
-
-    launch();
-
-    const cleanup = async () => {
-      setStatus('Closing browser...');
-      if (browserInstance) {
-        await browserInstance.close();
-      }
-      process.exit(0);
-    };
-
-    process.on('SIGINT', cleanup);
-    process.on('SIGTERM', cleanup);
-
+    process.once('SIGINT', handler);
+    process.once('SIGTERM', handler);
     return () => {
-      cleanup();
+      process.off('SIGINT', handler);
+      process.off('SIGTERM', handler);
     };
-  }, [browserType, channel, url]);
+  }, [stop]);
 
   return (
     <Box flexDirection="column">
@@ -104,12 +58,25 @@ const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
       <Text>Browser: {browserType}{channel ? ` (${channel})` : ''}</Text>
       {url && <Text>URL: {url}</Text>}
       <Text>Status: {status}</Text>
+      <Text dimColor>Press Ctrl+C to quit.</Text>
+      {actions.length > 0 && (
+        <>
+          <Text> </Text>
+          <Text color="yellow">📝 Generated Ruby Code:</Text>
+          {actions
+            .filter((a: RecordedAction) => a.code && !a.code.startsWith('#'))
+            .slice(-10)
+            .map((a: RecordedAction, idx: number) => (
+              <Text key={idx} color="cyan">  {a.code}</Text>
+            ))}
+        </>
+      )}
     </Box>
   );
 };
 
-render(<App 
-  browserType={argv.browser as 'chromium' | 'firefox' | 'webkit'} 
-  channel={argv.channel} 
-  url={(argv as any)._?.[0]} 
+render(<App
+  browserType={argv.browser as 'chromium' | 'firefox' | 'webkit'}
+  channel={argv.channel}
+  url={(argv as any)._?.[0]}
 />);
