@@ -49,6 +49,12 @@ npm run typecheck
 
 # Build TypeScript
 npm run build
+
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
 ## Integration Context
@@ -75,9 +81,12 @@ When implementing features, ensure generated Ruby code follows playwright-ruby-c
 - ✅ Complete Ruby script generation with proper boilerplate
 - ✅ Action type support (click, fill, press, check, select, etc.)
 - ✅ Error handling for undefined selectors
-- ✅ React Ink terminal UI with proper formatting
+- ✅ React Ink terminal UI with proper formatting and improved layout
 - ✅ Automatic duplicate action filtering
 - ✅ Remote debugging support with configurable port (--port option, default: 9223)
+- ✅ Comprehensive E2E test suite with Vitest
+- ✅ Test utilities and HTML page fixtures for easy test expansion
+- ✅ Automated testing of code generation accuracy
 
 ## Key Features to Implement
 
@@ -120,9 +129,18 @@ Options:
 - **Script Template**: Generates complete scripts with `Playwright.create` boilerplate
 - **Terminal Output**: Real-time display of generated Ruby code with proper formatting
 
+### Testing
+
+- **E2E Tests**: Comprehensive end-to-end testing using Vitest
+- **Test Architecture**: Modular test utilities with `CLITestHelper` class
+- **Test Scenarios**: Multiple form interaction scenarios (login, basic forms, empty forms)
+- **Code Validation**: Exact string matching for generated Ruby code verification
+- **Port Management**: Automatic port detection (9225-9230) for concurrent test runs
+
 ### Next Implementation Steps
 1. Improve selector generation (replace aria-ref with better strategies)
 2. Add assertions and wait condition support
 3. Implement file output and clipboard copy features
 4. Add device emulation and viewport configuration
 5. Enhance error handling and edge cases
+6. Expand test coverage with more complex interaction scenarios

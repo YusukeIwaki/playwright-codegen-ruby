@@ -88,6 +88,12 @@ npm run typecheck
 
 # Build TypeScript
 npm run build
+
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
 ## Usage Examples
@@ -136,8 +142,17 @@ playwright-codegen-ruby/
 │   ├── cli.tsx                # Main CLI entry point with Ruby script generation
 │   ├── useBrowserRecorder.ts  # Browser recording hook
 │   └── rubyCodeGenerator.ts   # Ruby code generation from Playwright actions
+├── tests/
+│   ├── e2e/
+│   │   └── codegen.test.ts    # End-to-end tests for code generation
+│   ├── fixtures/
+│   │   └── htmlPages.ts       # Test HTML page templates
+│   └── utils/
+│       ├── cliTestHelper.ts   # Common test utilities
+│       └── portUtils.ts       # Port detection utilities
 ├── package.json               # Dependencies and scripts
 ├── tsconfig.json              # TypeScript configuration
+├── vitest.config.ts           # Test configuration
 ├── CLAUDE.md                  # Development guidelines for AI assistance
 └── README.md                  # This file
 ```
@@ -147,7 +162,7 @@ playwright-codegen-ruby/
 ### ✅ Completed
 - Browser launching with Chromium support (fixed to Chromium for stability)
 - Browser channel support (Chrome, Edge, etc.)
-- React Ink terminal UI with proper formatting
+- React Ink terminal UI with proper formatting and improved layout
 - Real-time action recording using Playwright's internal recorder
 - Complete Ruby script generation with proper boilerplate
 - Support for various action types (click, fill, press, check, select, etc.)
@@ -156,6 +171,8 @@ playwright-codegen-ruby/
 - Automatic duplicate action filtering
 - Remote debugging support with configurable port (default: 9223)
 - Proper cleanup on exit (SIGINT/SIGTERM)
+- Comprehensive E2E test suite with multiple test scenarios
+- Test utilities and fixtures for easy test expansion
 
 ### 🚧 In Progress / TODO
 - Smart selector generation (currently using aria-ref selectors)
