@@ -2,26 +2,48 @@
   "name": "playwright-codegen-ruby",
   "version": "0.1.0",
   "description": "Ruby code generator for Playwright",
-  "main": "src/index.tsx",
+  "main": "src/cli.tsx",
   "type": "module",
   "bin": {
     "playwright-codegen-ruby": "./src/cli.tsx"
   },
+  "files": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "start": "tsx src/cli.tsx",
     "dev": "tsx watch src/cli.tsx",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run test",
+    "prepack": "npm run build"
   },
   "keywords": [
     "playwright",
     "ruby",
     "codegen",
     "test",
-    "automation"
+    "automation",
+    "browser",
+    "e2e",
+    "testing",
+    "code-generation",
+    "playwright-ruby"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YusukeIwaki/playwright-codegen-ruby.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YusukeIwaki/playwright-codegen-ruby/issues"
+  },
+  "homepage": "https://github.com/YusukeIwaki/playwright-codegen-ruby#readme",
   "author": "YusukeIwaki",
   "license": "MIT",
   "dependencies": {
