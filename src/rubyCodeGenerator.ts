@@ -1,9 +1,14 @@
-export function generateRubyCode(action: any): string { // eslint-disable-line @typescript-eslint/no-explicit-any
+import { Page, Locator } from 'playwright-core';
+
+export async function generateRubyCode(action: any, page?: Page): Promise<string> { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!action || !action.name) {
     return `# Invalid action`;
   }
   
   const { name } = action;
+  
+  // Use generatedSelector if available (from generateLocatorString)
+  const selectorToUse = action.generatedSelector || action.selector;
   
   try {
     switch (name) {
@@ -14,61 +19,61 @@ export function generateRubyCode(action: any): string { // eslint-disable-line @
         return `page.goto("${action.url || 'about:blank'}")`;
       
       case 'click': {
-      if (!action.selector) return `# Click action without selector`;
-      const selector = formatSelector(action.selector);
-      return `page.click("${selector}")`;
+      if (!selectorToUse) return `# Click action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `page.${selector}.click`;
     }
     
     case 'fill': {
-      if (!action.selector) return `# Fill action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# Fill action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       const text = action.text || '';
-      return `page.fill("${selector}", "${text}")`;
+      return `page.${selector}.fill("${text}")`;
     }
     
     case 'press': {
-      if (!action.selector) return `# Press action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# Press action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       const key = action.key || '';
-      return `page.press("${selector}", "${key}")`;
+      return `page.${selector}.press("${key}")`;
     }
     
     case 'check': {
-      if (!action.selector) return `# Check action without selector`;
-      const selector = formatSelector(action.selector);
-      return `page.check("${selector}")`;
+      if (!selectorToUse) return `# Check action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `page.${selector}.check`;
     }
     
     case 'uncheck': {
-      if (!action.selector) return `# Uncheck action without selector`;
-      const selector = formatSelector(action.selector);
-      return `page.uncheck("${selector}")`;
+      if (!selectorToUse) return `# Uncheck action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `page.${selector}.uncheck`;
     }
     
     case 'select': {
-      if (!action.selector) return `# Select action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# Select action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       if (!action.options || action.options.length === 0) {
-        return `page.select_option("${selector}", value: [])`;
+        return `page.${selector}.select_option(value: [])`;
       }
       const values = action.options.map((opt: any) => `"${opt}"`).join(', '); // eslint-disable-line @typescript-eslint/no-explicit-any
-      return `page.select_option("${selector}", value: [${values}])`;
+      return `page.${selector}.select_option(value: [${values}])`;
     }
     
     case 'setInputFiles': {
-      if (!action.selector) return `# SetInputFiles action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# SetInputFiles action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       if (!action.files || action.files.length === 0) {
-        return `page.set_input_files("${selector}", [])`;
+        return `page.${selector}.set_input_files([])`;
       }
       const files = action.files.map((f: string) => `"${f}"`).join(', ');
-      return `page.set_input_files("${selector}", [${files}])`;
+      return `page.${selector}.set_input_files([${files}])`;
     }
     
     case 'hover': {
-      if (!action.selector) return `# Hover action without selector`;
-      const selector = formatSelector(action.selector);
-      return `page.hover("${selector}")`;
+      if (!selectorToUse) return `# Hover action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `page.${selector}.hover`;
     }
     
     case 'waitForNavigation':
@@ -78,29 +83,29 @@ export function generateRubyCode(action: any): string { // eslint-disable-line @
       return `page.wait_for_load_state("${action.state || 'load'}")`;
       
     case 'assertText': {
-      if (!action.selector) return `# AssertText action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# AssertText action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       const text = action.text || '';
-      return `expect(page.locator("${selector}")).to have_text("${text}")`;
+      return `expect(page.${selector}).to have_text("${text}")`;
     }
     
     case 'assertValue': {
-      if (!action.selector) return `# AssertValue action without selector`;
-      const selector = formatSelector(action.selector);
+      if (!selectorToUse) return `# AssertValue action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
       const value = action.value || '';
-      return `expect(page.locator("${selector}")).to have_value("${value}")`;
+      return `expect(page.${selector}).to have_value("${value}")`;
     }
     
     case 'assertChecked': {
-      if (!action.selector) return `# AssertChecked action without selector`;
-      const selector = formatSelector(action.selector);
-      return `expect(page.locator("${selector}")).to be_checked`;
+      if (!selectorToUse) return `# AssertChecked action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `expect(page.${selector}).to be_checked`;
     }
     
     case 'assertVisible': {
-      if (!action.selector) return `# AssertVisible action without selector`;
-      const selector = formatSelector(action.selector);
-      return `expect(page.locator("${selector}")).to be_visible`;
+      if (!selectorToUse) return `# AssertVisible action without selector`;
+      const selector = await formatSelector(selectorToUse, action.selector, page);
+      return `expect(page.${selector}).to be_visible`;
     }
       
       // Additional action types that might occur
@@ -132,16 +137,21 @@ export function generateRubyCode(action: any): string { // eslint-disable-line @
   }
 }
 
-function formatSelector(selector: string | undefined | null): string {
+async function formatSelector(selector: string | undefined | null, originalSelector?: string, page?: Page): Promise<string> {
   // Handle undefined or null selector
   if (!selector) {
-    return '';
+    return 'locator("")';
   }
   
-  // Handle aria-ref selectors (internal Playwright format)
-  if (selector.startsWith('aria-ref=')) {
-    // This is an internal reference, we need to use a different selector
-    return selector; // Will be handled by Playwright
+  // Check if this is a JavaScript locator string (from generateLocatorString)
+  if (selector.startsWith('getBy')) {
+    return convertJsLocatorToRuby(selector);
+  }
+  
+  // Handle aria-ref selectors (internal Playwright format) - should not reach here if generateLocatorString worked
+  if (originalSelector && originalSelector.startsWith('aria-ref=')) {
+    // Fall back to using aria-ref directly - the Ruby client should handle it
+    return `locator("${originalSelector.replace(/"/g, '\\"')}")`;
   }
   
   // Handle getByRole, getByText, etc.
@@ -151,23 +161,107 @@ function formatSelector(selector: string | undefined | null): string {
       const [, method, value] = match;
       switch (method.toLowerCase()) {
         case 'role':
-          return `role=${value}`;
+          return `locator("role=${value}")`;
         case 'text':
-          return `text=${value}`;
+          return `locator("text=${value}")`;
         case 'label':
-          return `label=${value}`;
+          return `locator("label=${value}")`;
         case 'placeholder':
-          return `placeholder=${value}`;
+          return `locator("placeholder=${value}")`;
         case 'title':
-          return `title=${value}`;
+          return `locator("title=${value}")`;
         case 'testid':
-          return `data-testid=${value}`;
+          return `locator("data-testid=${value}")`;
         default:
-          return selector;
+          return `locator("${selector.replace(/"/g, '\\"')}")`;
       }
     }
   }
   
-  // Escape quotes in selector
-  return selector.replace(/"/g, '\\"');
+  // Escape quotes in selector and wrap in locator
+  return `locator("${selector.replace(/"/g, '\\"')}")`;
+}
+
+function convertJsLocatorToRuby(jsLocator: string): string {
+  // Convert JavaScript locator syntax to Ruby syntax
+  // Examples:
+  // getByRole('button', { name: 'Submit' }) -> get_by_role("button", name: "Submit")
+  // getByText('Hello') -> get_by_text("Hello")
+  // getByPlaceholder('Enter text') -> get_by_placeholder("Enter text")
+  
+  // Match method name and arguments
+  const match = jsLocator.match(/(getBy\w+)\((.*)\)/);
+  if (!match) {
+    return `locator("${jsLocator.replace(/"/g, '\\"')}")`;
+  }
+  
+  const [, methodName, args] = match;
+  
+  // Convert camelCase to snake_case
+  const rubyMethodName = methodName.replace(/([A-Z])/g, '_$1').toLowerCase();
+  
+  // Parse and convert arguments
+  let rubyArgs = args;
+  
+  // Replace single quotes with double quotes
+  rubyArgs = rubyArgs.replace(/'/g, '"');
+  
+  // Convert object notation { key: value } to Ruby hash notation key: value
+  rubyArgs = rubyArgs.replace(/\{\s*(\w+):\s*/g, '$1: ');
+  rubyArgs = rubyArgs.replace(/\s*\}/g, '');
+  
+  // Handle multiple arguments separated by comma
+  if (rubyArgs.includes(',')) {
+    // Split arguments and process each
+    const argParts = rubyArgs.split(/,\s*(?![^{]*})/).map(part => part.trim());
+    return `${rubyMethodName}(${argParts.join(', ')})`;
+  }
+  
+  return `${rubyMethodName}(${rubyArgs})`;
+}
+
+function convertSelectorToRuby(selector: string): string {
+  // Try to convert internal selector formats to Ruby-style locators
+  
+  // Handle role selectors
+  if (selector.startsWith('role=')) {
+    const parts = selector.substring(5).split('[');
+    const role = parts[0];
+    
+    // Extract attributes like name
+    if (parts[1]) {
+      const nameMatch = parts[1].match(/name="([^"]+)"/);
+      if (nameMatch) {
+        return `get_by_role("${role}", name: "${nameMatch[1]}")`;
+      }
+    }
+    return `get_by_role("${role}")`;
+  }
+  
+  // Handle text selectors
+  if (selector.startsWith('text=')) {
+    const text = selector.substring(5);
+    return `get_by_text("${text.replace(/"/g, '\\"')}")`;
+  }
+  
+  // Handle placeholder selectors
+  if (selector.startsWith('placeholder=')) {
+    const placeholder = selector.substring(12);
+    return `get_by_placeholder("${placeholder.replace(/"/g, '\\"')}")`;
+  }
+  
+  // Handle label selectors
+  if (selector.startsWith('label=')) {
+    const label = selector.substring(6);
+    return `get_by_label("${label.replace(/"/g, '\\"')}")`;
+  }
+  
+  // Handle test-id selectors
+  if (selector.startsWith('data-testid=')) {
+    const testId = selector.substring(12);
+    return `get_by_test_id("${testId.replace(/"/g, '\\"')}")`;
+  }
+  
+  // Default: use locator with the selector as-is
+  return `locator("${selector.replace(/"/g, '\\"')}")`;
 }
