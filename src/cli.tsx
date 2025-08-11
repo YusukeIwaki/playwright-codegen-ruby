@@ -7,8 +7,8 @@ import { hideBin } from 'yargs/helpers';
 import { useBrowserRecorder, RecordedAction } from './useBrowserRecorder.js';
 
 interface AppProps {
-  browserType: 'chromium' | 'firefox' | 'webkit';
   channel?: string;
+  port: number;
   url?: string;
 }
 
@@ -18,22 +18,21 @@ const argv = await yargs(hideBin(process.argv))
     describe: 'URL to open',
     type: 'string'
   })
-  .option('browser', {
-    alias: 'b',
-    type: 'string',
-    description: 'Browser to use',
-    choices: ['chromium', 'firefox', 'webkit'] as const,
-    default: 'chromium'
-  })
   .option('channel', {
     alias: 'c',
     type: 'string',
     description: 'Browser channel to use (e.g., chrome, msedge)'
   })
+  .option('port', {
+    alias: 'p',
+    type: 'number',
+    description: 'Remote debugging port',
+    default: 9223
+  })
   .help()
   .argv;
 
-const generateCompleteRubyScript = (browserType: string, channel: string | undefined, url: string | undefined, actions: RecordedAction[]): string[] => {
+const generateCompleteRubyScript = (channel: string | undefined, url: string | undefined, actions: RecordedAction[]): string[] => {
   const lines: string[] = [];
 
   // Add require statements
@@ -43,8 +42,8 @@ const generateCompleteRubyScript = (browserType: string, channel: string | undef
   // Start Playwright block with executable path
   lines.push(`Playwright.create(playwright_cli_executable_path: './node_modules/.bin/playwright') do |playwright|`);
 
-  // Browser launch with block
-  let browserLine = `  playwright.${browserType}.launch(headless: false`;
+  // Launch chromium browser with block
+  let browserLine = `  playwright.chromium.launch(headless: false`;
   if (channel) {
     browserLine += `, channel: "${channel}"`;
   }
@@ -83,8 +82,8 @@ const generateCompleteRubyScript = (browserType: string, channel: string | undef
   return lines;
 };
 
-const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
-  const { status, actions, stop } = useBrowserRecorder({ browserType, channel, url });
+const App: React.FC<AppProps> = ({ channel, port, url }) => {
+  const { status, actions, stop } = useBrowserRecorder({ browserType: 'chromium', channel, port, url });
 
   // When process receives signals, ask hook to stop (once) then exit after short delay
   useEffect(() => {
@@ -102,12 +101,12 @@ const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
     };
   }, [stop]);
 
-  const rubyScript = generateCompleteRubyScript(browserType, channel, url, actions);
+  const rubyScript = generateCompleteRubyScript(channel, url, actions);
 
   return (
     <Box flexDirection="column">
       <Text color="green">🎭 Playwright Codegen for Ruby</Text>
-      <Text>Browser: {browserType}{channel ? ` (${channel})` : ''}</Text>
+      <Text>Browser: chromium{channel ? ` (${channel})` : ''} - Debug port: {port}</Text>
       {url && <Text>URL: {url}</Text>}
       <Text>Status: {status}</Text>
       <Text dimColor>Press Ctrl+C to quit.</Text>
@@ -127,7 +126,7 @@ const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
 };
 
 render(<App
-  browserType={argv.browser as 'chromium' | 'firefox' | 'webkit'}
   channel={argv.channel}
+  port={argv.port}
   url={(argv as any)._?.[0]}
 />);

@@ -12,9 +12,9 @@ Key differentiator: Uses React Ink for a CLI interface instead of the GUI window
 
 ### Expected Structure
 - **CLI Interface**: React Ink-based terminal UI for interaction recording
-- **Browser Control**: Playwright integration for browser automation
+- **Browser Control**: Chromium-based browser automation (fixed for stability)
 - **Code Generation**: Outputs Ruby code compatible with playwright-ruby-client
-- **Multi-browser Support**: Chromium, Firefox, WebKit
+- **Channel Support**: Chrome, Edge, and other Chromium-based browsers
 
 ### Technology Stack
 - Node.js/JavaScript for browser interaction and CLI
@@ -38,8 +38,8 @@ npx playwright install chromium  # or firefox, webkit
 # Start the CLI
 npm start
 npm start https://example.com
-npm start -- -b firefox https://example.com
 npm start -- --channel chrome https://google.com
+npm start -- --port 9224 https://example.com
 
 # Development mode (watches for file changes)
 npm run dev
@@ -69,7 +69,7 @@ When implementing features, ensure generated Ruby code follows playwright-ruby-c
 
 ## Completed Features
 
-- ✅ Browser launching with recording capabilities (Chromium, Firefox, WebKit)
+- ✅ Browser launching with recording capabilities (Chromium-based, fixed for stability)
 - ✅ Browser channel support (Chrome, Edge, etc.) 
 - ✅ Real-time Ruby code generation as user interacts
 - ✅ Complete Ruby script generation with proper boilerplate
@@ -77,6 +77,7 @@ When implementing features, ensure generated Ruby code follows playwright-ruby-c
 - ✅ Error handling for undefined selectors
 - ✅ React Ink terminal UI with proper formatting
 - ✅ Automatic duplicate action filtering
+- ✅ Remote debugging support with configurable port (--port option, default: 9223)
 
 ## Key Features to Implement
 
@@ -101,15 +102,17 @@ When implementing features, ensure generated Ruby code follows playwright-ruby-c
 npx playwright-codegen-ruby [options] [url]
 
 Options:
-  -b, --browser    Browser to use (chromium, firefox, webkit)
   -c, --channel    Browser channel (chrome, msedge, etc.)
+  -p, --port       Remote debugging port (default: 9223)
   --help          Show help
 ```
 
 ### Browser Launch Configuration
+- **Browser**: Fixed to Chromium for stability and consistency
 - **Headless**: Always false (user needs to see the browser)
 - **Viewport**: Set to null for full window size
 - **Channel Support**: Allows using system-installed browsers (Chrome, Edge)
+- **Remote Debugging**: Configurable port (--port option, default: 9223)
 
 ### Architecture Details
 - **Recording**: Uses Playwright's internal `_enableRecorder` API with custom ReactiveRecorderLog

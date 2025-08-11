@@ -14,7 +14,7 @@ While the official codegen shows a window for generated code, this is a CLI appl
 
 ## Features
 
-- 🌐 Multi-browser support (Chromium, Firefox, WebKit)
+- 🌐 Chromium-based browser support (system Chrome, Edge, etc.)
 - 📝 Generates complete Ruby scripts compatible with playwright-ruby-client
 - 🖥️ Terminal-based interface using React Ink
 - 🔧 Support for browser channels (Chrome, Edge, etc.)
@@ -22,6 +22,7 @@ While the official codegen shows a window for generated code, this is a CLI appl
 - 📋 Displays complete, copy-paste ready Ruby scripts
 - ✨ Proper indentation and Ruby code formatting
 - 🔄 Automatic duplicate action filtering
+- 🐛 Remote debugging support with configurable port
 
 ## Development Setup
 
@@ -63,14 +64,14 @@ npm start
 # Open a specific URL
 npm start https://example.com
 
-# Use Firefox
-npm start -- -b firefox https://example.com
-
 # Use Chrome stable channel
 npm start -- --channel chrome https://example.com
 
 # Use Microsoft Edge
-npm start -- -b chromium --channel msedge https://example.com
+npm start -- --channel msedge https://example.com
+
+# Use custom debug port (default: 9223)
+npm start -- --port 9224 https://example.com
 
 # Show help
 npm start -- --help
@@ -95,11 +96,14 @@ npm run build
 # Record interactions on example.com
 npx playwright-codegen-ruby https://example.com
 
-# Use WebKit browser
-npx playwright-codegen-ruby -b webkit https://example.com
-
 # Use system Chrome instead of Chromium
 npx playwright-codegen-ruby --channel chrome https://example.com
+
+# Use custom debug port for multiple instances
+npx playwright-codegen-ruby --port 9224 https://example.com
+
+# Use Microsoft Edge with custom port
+npx playwright-codegen-ruby --channel msedge --port 9225 https://example.com
 ```
 
 ### Generated Code Example
@@ -141,7 +145,7 @@ playwright-codegen-ruby/
 ## Implementation Status
 
 ### ✅ Completed
-- Browser launching with Chromium, Firefox, and WebKit support
+- Browser launching with Chromium support (fixed to Chromium for stability)
 - Browser channel support (Chrome, Edge, etc.)
 - React Ink terminal UI with proper formatting
 - Real-time action recording using Playwright's internal recorder
@@ -150,6 +154,7 @@ playwright-codegen-ruby/
 - Proper Ruby code indentation and formatting
 - Error handling for undefined selectors
 - Automatic duplicate action filtering
+- Remote debugging support with configurable port (default: 9223)
 - Proper cleanup on exit (SIGINT/SIGTERM)
 
 ### 🚧 In Progress / TODO

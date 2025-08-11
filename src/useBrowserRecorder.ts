@@ -5,6 +5,7 @@ import { generateRubyCode } from './rubyCodeGenerator.js';
 interface UseBrowserRecorderParams {
   browserType: 'chromium' | 'firefox' | 'webkit';
   channel?: string;
+  port: number;
   url?: string;
 }
 
@@ -34,7 +35,7 @@ class ReactiveRecorderLog {
   }
 }
 
-export function useBrowserRecorder({ browserType, channel, url }: UseBrowserRecorderParams) {
+export function useBrowserRecorder({ browserType, channel, port, url }: UseBrowserRecorderParams) {
   const [status, setStatus] = useState<string>('Starting...');
   const [actions, setActions] = useState<RecordedAction[]>([]);
   const browserRef = useRef<Browser | null>(null);
@@ -61,7 +62,13 @@ export function useBrowserRecorder({ browserType, channel, url }: UseBrowserReco
         setStatus(`Launching ${browserType}${channel ? ` (${channel})` : ''}...`);
         const browsers = { chromium, firefox, webkit } as const;
         const selectedBrowser = browsers[browserType];
-        const launchOptions: any = { headless: false }; // eslint-disable-line @typescript-eslint/no-explicit-any
+        const launchOptions: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+            headless: false,
+            args: [
+                // Add remote debugging port for chromium
+                `--remote-debugging-port=${port}`
+            ]
+        };
         if (channel) launchOptions.channel = channel;
         const browser = await selectedBrowser.launch(launchOptions);
         browserRef.current = browser;
@@ -84,8 +91,9 @@ export function useBrowserRecorder({ browserType, channel, url }: UseBrowserReco
 
         const page = await context.newPage();
         if (url) await page.goto(url);
-        if (!cancelled)
-          setStatus(`${browserType}${channel ? ` (${channel})` : ''} is running. Press Ctrl+C to exit.`);
+        if (!cancelled) {
+          setStatus(`${browserType}${channel ? ` (${channel})` : ''} is running. Debug at http://localhost:${port}. Press Ctrl+C to exit.`);
+        }
       } catch (e) {
         if (!cancelled) setStatus(`Error: ${(e as Error).message}`);
       }
@@ -94,7 +102,7 @@ export function useBrowserRecorder({ browserType, channel, url }: UseBrowserReco
       cancelled = true;
       void stop();
     };
-  }, [browserType, channel, url, stop]);
+  }, [browserType, channel, port, url, stop]);
 
   return { status, actions, stop };
 }
