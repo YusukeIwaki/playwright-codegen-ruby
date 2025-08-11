@@ -15,11 +15,13 @@ While the official codegen shows a window for generated code, this is a CLI appl
 ## Features
 
 - 🌐 Multi-browser support (Chromium, Firefox, WebKit)
-- 📝 Generates Ruby code compatible with playwright-ruby-client
+- 📝 Generates complete Ruby scripts compatible with playwright-ruby-client
 - 🖥️ Terminal-based interface using React Ink
 - 🔧 Support for browser channels (Chrome, Edge, etc.)
 - 🎯 Real-time recording of browser interactions
-- 📋 Display last 10 recorded actions in terminal
+- 📋 Displays complete, copy-paste ready Ruby scripts
+- ✨ Proper indentation and Ruby code formatting
+- 🔄 Automatic duplicate action filtering
 
 ## Development Setup
 
@@ -100,13 +102,36 @@ npx playwright-codegen-ruby -b webkit https://example.com
 npx playwright-codegen-ruby --channel chrome https://example.com
 ```
 
+### Generated Code Example
+
+The tool generates complete Ruby scripts that can be directly executed:
+
+```ruby
+require "playwright"
+
+Playwright.create(playwright_cli_executable_path: './node_modules/.bin/playwright') do |playwright|
+  playwright.chromium.launch(headless: false) do |browser|
+    context = browser.new_context
+    page = context.new_page
+
+    page.goto("https://example.com")
+
+    # Recorded actions:
+    page.click("button[type=\"submit\"]")
+    page.fill("input[name=\"email\"]", "user@example.com")
+    page.press("input[name=\"password\"]", "Enter")
+  end
+end
+```
+
 ## Project Structure
 
 ```
 playwright-codegen-ruby/
 ├── src/
-│   ├── cli.tsx                # Main CLI entry point
-│   └── useBrowserRecorder.ts  # Browser recording hook
+│   ├── cli.tsx                # Main CLI entry point with Ruby script generation
+│   ├── useBrowserRecorder.ts  # Browser recording hook
+│   └── rubyCodeGenerator.ts   # Ruby code generation from Playwright actions
 ├── package.json               # Dependencies and scripts
 ├── tsconfig.json              # TypeScript configuration
 ├── CLAUDE.md                  # Development guidelines for AI assistance
@@ -118,18 +143,22 @@ playwright-codegen-ruby/
 ### ✅ Completed
 - Browser launching with Chromium, Firefox, and WebKit support
 - Browser channel support (Chrome, Edge, etc.)
-- React Ink terminal UI
+- React Ink terminal UI with proper formatting
 - Real-time action recording using Playwright's internal recorder
-- Display of last 10 recorded actions
+- Complete Ruby script generation with proper boilerplate
+- Support for various action types (click, fill, press, check, select, etc.)
+- Proper Ruby code indentation and formatting
+- Error handling for undefined selectors
+- Automatic duplicate action filtering
 - Proper cleanup on exit (SIGINT/SIGTERM)
 
 ### 🚧 In Progress / TODO
-- Generate proper Ruby code from recorded actions
-- Smart selector generation
-- Support for assertions
+- Smart selector generation (currently using aria-ref selectors)
+- Support for assertions and wait conditions
 - File output and clipboard copy functionality
 - Authentication state preservation
 - Device emulation and viewport configuration
+- Better selector strategies for more maintainable tests
 
 ## License
 

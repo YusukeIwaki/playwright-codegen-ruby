@@ -13,7 +13,7 @@ export function generateRubyCode(action: any): string { // eslint-disable-line @
       case 'navigate':
         return `page.goto("${action.url || 'about:blank'}")`;
       
-    case 'click': {
+      case 'click': {
       if (!action.selector) return `# Click action without selector`;
       const selector = formatSelector(action.selector);
       return `page.click("${selector}")`;

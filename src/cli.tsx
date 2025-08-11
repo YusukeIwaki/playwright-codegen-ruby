@@ -33,6 +33,56 @@ const argv = await yargs(hideBin(process.argv))
   .help()
   .argv;
 
+const generateCompleteRubyScript = (browserType: string, channel: string | undefined, url: string | undefined, actions: RecordedAction[]): string[] => {
+  const lines: string[] = [];
+
+  // Add require statements
+  lines.push('require "playwright"');
+  lines.push('');
+
+  // Start Playwright block with executable path
+  lines.push(`Playwright.create(playwright_cli_executable_path: './node_modules/.bin/playwright') do |playwright|`);
+
+  // Browser launch with block
+  let browserLine = `  playwright.${browserType}.launch(headless: false`;
+  if (channel) {
+    browserLine += `, channel: "${channel}"`;
+  }
+  browserLine += ') do |browser|';
+  lines.push(browserLine);
+
+  // Context and page setup
+  lines.push('    context = browser.new_context');
+  lines.push('    page = context.new_page');
+  lines.push('');
+
+  // Add initial navigation if URL provided
+  if (url) {
+    lines.push(`    page.goto("${url}")`);
+    lines.push('');
+  }
+
+  // Add recorded actions with proper indentation
+  const validActions = actions.filter((a: RecordedAction) => a.code && !a.code.startsWith('#'));
+  if (validActions.length > 0) {
+    lines.push('    # Recorded actions:');
+    validActions.forEach((a: RecordedAction) => {
+      // Skip duplicate navigation to the initial URL
+      if (url && a.code.includes(`page.goto("${url}")`)) {
+        return; // Skip this action since it's already handled in initial navigation
+      }
+      lines.push(`    ${a.code}`);
+    });
+  }
+
+  // Close browser block
+  lines.push('  end');
+  // Close Playwright block
+  lines.push('end');
+
+  return lines;
+};
+
 const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
   const { status, actions, stop } = useBrowserRecorder({ browserType, channel, url });
 
@@ -52,6 +102,8 @@ const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
     };
   }, [stop]);
 
+  const rubyScript = generateCompleteRubyScript(browserType, channel, url, actions);
+
   return (
     <Box flexDirection="column">
       <Text color="green">🎭 Playwright Codegen for Ruby</Text>
@@ -62,13 +114,12 @@ const App: React.FC<AppProps> = ({ browserType, channel, url }) => {
       {actions.length > 0 && (
         <>
           <Text> </Text>
-          <Text color="yellow">📝 Generated Ruby Code:</Text>
-          {actions
-            .filter((a: RecordedAction) => a.code && !a.code.startsWith('#'))
-            .slice(-10)
-            .map((a: RecordedAction, idx: number) => (
-              <Text key={idx} color="cyan">  {a.code}</Text>
-            ))}
+          <Text color="yellow">📝 Ruby Script</Text>
+          <Text dimColor>─────────────────────────────────────</Text>
+          {rubyScript.map((line: string, idx: number) => (
+            <Text key={idx} color="cyan">{line || ' '}</Text>
+          ))}
+          <Text dimColor>─────────────────────────────────────</Text>
         </>
       )}
     </Box>

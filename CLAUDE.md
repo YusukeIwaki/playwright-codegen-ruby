@@ -24,7 +24,7 @@ Key differentiator: Uses React Ink for a CLI interface instead of the GUI window
 
 ## Current Status
 
-**Base Implementation Complete** - CLI launches Playwright browsers with TypeScript/TSX and React Ink interface. Core recording and code generation features pending.
+**Core Recording and Code Generation Complete** - CLI launches browsers, records interactions, and generates complete Ruby scripts with proper playwright-ruby-client syntax. Ready for selector improvements and advanced features.
 
 ## Development Commands
 
@@ -67,14 +67,25 @@ When implementing features, ensure generated Ruby code follows playwright-ruby-c
 3. **Locator Strategy**: Implement smart selector generation similar to official Playwright codegen
 4. **Browser Context**: Support authentication state, cookies, and viewport settings
 
+## Completed Features
+
+- ✅ Browser launching with recording capabilities (Chromium, Firefox, WebKit)
+- ✅ Browser channel support (Chrome, Edge, etc.) 
+- ✅ Real-time Ruby code generation as user interacts
+- ✅ Complete Ruby script generation with proper boilerplate
+- ✅ Action type support (click, fill, press, check, select, etc.)
+- ✅ Error handling for undefined selectors
+- ✅ React Ink terminal UI with proper formatting
+- ✅ Automatic duplicate action filtering
+
 ## Key Features to Implement
 
-- Browser launching with recording capabilities
-- Real-time Ruby code generation as user interacts
-- Smart locator generation with fallback strategies
+- Smart locator generation with fallback strategies (currently using aria-ref)
 - Support for assertions and wait conditions
 - Device emulation and viewport configuration
 - Authentication state preservation
+- File output and clipboard copy functionality
+- Better selector strategies for maintainable tests
 
 ## Important Implementation Notes
 
@@ -100,9 +111,15 @@ Options:
 - **Viewport**: Set to null for full window size
 - **Channel Support**: Allows using system-installed browsers (Chrome, Edge)
 
+### Architecture Details
+- **Recording**: Uses Playwright's internal `_enableRecorder` API with custom ReactiveRecorderLog
+- **Code Generation**: Transforms Playwright actions into Ruby code via `rubyCodeGenerator.ts`
+- **Script Template**: Generates complete scripts with `Playwright.create` boilerplate
+- **Terminal Output**: Real-time display of generated Ruby code with proper formatting
+
 ### Next Implementation Steps
-1. Add Playwright Inspector integration for recording
-2. Implement action recording event listeners
-3. Create Ruby code generation from recorded actions
-4. Add file output and clipboard copy features
-5. Implement selector generation strategies
+1. Improve selector generation (replace aria-ref with better strategies)
+2. Add assertions and wait condition support
+3. Implement file output and clipboard copy features
+4. Add device emulation and viewport configuration
+5. Enhance error handling and edge cases
