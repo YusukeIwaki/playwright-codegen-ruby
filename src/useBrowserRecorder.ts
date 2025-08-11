@@ -22,39 +22,14 @@ class ReactiveRecorderLog {
     this.pushCb = pushCb;
   }
 
-  /**
-   * Improve action by resolving aria-ref selectors to getByXxx format
-   */
-  private async improveAction(page: Page, action: any): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const improvedAction = { ...action };
-    
-    if (improvedAction.selector && improvedAction.selector.startsWith('aria-ref=')) {
-      try {
-        // Try to use internal generateLocatorString API if available
-        await (page as any)._snapshotForAI(); // eslint-disable-line @typescript-eslint/no-explicit-any
-        const locator = page.locator(improvedAction.selector);
-        const locatorString = await (locator as any)._generateLocatorString(); // eslint-disable-line @typescript-eslint/no-explicit-any
-        if (locatorString) {
-          improvedAction.generatedSelector = locatorString;
-        }
-      } catch (e) {
-        // Ignore errors and fall back to original selector
-      }
-    }
-
-    return improvedAction;
-  }
-
-  async actionAdded(page: Page, actionInContext: any, _code: string): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const improvedAction = await this.improveAction(page, actionInContext.action);
-    const rubyCode = await generateRubyCode(improvedAction, page);
+  actionAdded(_page: Page, actionInContext: any, _code: string): void { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const rubyCode = generateRubyCode(actionInContext.action);
     this.actions.push({ ...actionInContext, code: rubyCode });
     this.pushCb([...this.actions]);
   }
 
-  async actionUpdated(page: Page, actionInContext: any, _code: string): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const improvedAction = await this.improveAction(page, actionInContext.action);
-    const rubyCode = await generateRubyCode(improvedAction, page);
+  actionUpdated(_page: Page, actionInContext: any, _code: string): void { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const rubyCode = generateRubyCode(actionInContext.action);
     this.actions[this.actions.length - 1] = { ...actionInContext, code: rubyCode };
     this.pushCb([...this.actions]);
   }

@@ -64,15 +64,15 @@ end
       await context.page.click('#login-btn');
 
       // Wait briefly to ensure code generation
-      await helper.wait(1500);
+      await helper.wait(1000);
 
       // Verify generated Ruby code
       helper.expectOutputContains([
         '# Recorded actions:',
-        'page.get_by_role("textbox", name: "Username or Email").fill("admin@example.com")',
-        'page.get_by_role("textbox", name: "Password").fill("secretpassword123")',
-        'page.get_by_role("checkbox", name: "Remember me").check',
-        'page.get_by_role("button", name: "Sign In").click',
+        'page.fill("aria-ref=e7", "admin@example.com")',
+        'page.fill("aria-ref=e10", "secretpassword123")',
+        'page.check("aria-ref=e13")',
+        'page.click("aria-ref=e14")',
       ]);
 
       console.log('✅ Login form test passed - Ruby code generated correctly');
@@ -96,14 +96,14 @@ end
       await context.page.click('#submit-btn');
 
       // Wait briefly to ensure code generation
-      await helper.wait(1500);
+      await helper.wait(1000);
 
       // Verify generated Ruby code
       helper.expectOutputContains([
         '# Recorded actions:',
-        'page.get_by_role("textbox", name: "Enter name").fill("John Doe")',
-        'page.get_by_role("textbox", name: "Enter email").fill("john.doe@test.com")',
-        'page.get_by_role("button", name: "Submit").click'
+        'page.fill("aria-ref=e4", "John Doe")',
+        'page.fill("aria-ref=e5", "john.doe@test.com")',
+        'page.click("aria-ref=e6")'
       ]);
 
       console.log('✅ Basic form test passed - Ruby code generated correctly');
@@ -125,12 +125,12 @@ end
       await context.page.click('#login-btn');
 
       // Wait briefly to ensure code generation
-      await helper.wait(1500);
+      await helper.wait(1000);
 
       // Verify that basic Ruby structure is generated
       helper.expectOutputContains([
         '# Recorded actions:',
-        'page.get_by_role("button", name: "Sign In").click'
+        'page.click("aria-ref=e14")'
       ]);
 
       console.log('✅ Empty form test passed - Basic Ruby code structure generated');
